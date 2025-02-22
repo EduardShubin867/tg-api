@@ -26,8 +26,8 @@ services:
             - app-network
 
 networks:
-    app-network:
-        driver: bridge
+    bot-network:
+        external: true
 
 volumes:
     mongodb_data:
