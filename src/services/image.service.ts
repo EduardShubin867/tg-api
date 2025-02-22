@@ -4,12 +4,24 @@ import fs from 'fs/promises'
 import { config } from '../config'
 
 export class ImageService {
+    private getFullPath(filename: string): string {
+        // Обрабатываем пути с подпапками
+        return path.join(config.uploadDir, filename)
+    }
+
+    private getCachePath(filename: string, size?: string): string {
+        const { dir, name } = path.parse(filename)
+        const cacheDir = path.join(config.uploadDir, 'cache', dir)
+        const cacheKey = `${name}_${size || 'original'}.webp`
+        return path.join(cacheDir, cacheKey)
+    }
+
     async processImage(
         filename: string,
         format: 'jpeg' | 'webp' | 'png' = 'webp',
         size?: keyof typeof config.imageOptions.sizes
     ) {
-        const inputPath = path.join(config.uploadDir, filename)
+        const inputPath = this.getFullPath(filename)
         const image = sharp(inputPath)
 
         // Получаем информацию об изображении
@@ -31,16 +43,16 @@ export class ImageService {
             lossless: false, // Используем сжатие с потерями для лучшего размера
         })
 
-        // Изменяем имя файла на .webp
-        const outputFilename = `${path.parse(filename).name}_${size || 'original'}.webp`
-        const outputPath = path.join(config.uploadDir, outputFilename)
+        // Сохраняем в кэш с сохранением структуры подпапок
+        const cachePath = this.getCachePath(filename, size)
+        await fs.mkdir(path.dirname(cachePath), { recursive: true })
+        await image.toFile(cachePath)
 
         // Удаляем оригинальный файл после конвертации
-        await image.toFile(outputPath)
         await fs.unlink(inputPath).catch(() => {}) // Игнорируем ошибки при удалении
 
         return {
-            filename: outputFilename,
+            filename,
             format: 'webp',
             size: size || 'original',
             width: metadata.width,
@@ -49,17 +61,18 @@ export class ImageService {
     }
 
     async deleteImage(filename: string) {
-        const filepath = path.join(config.uploadDir, filename)
+        const filepath = this.getFullPath(filename)
         await fs.unlink(filepath)
 
-        // Также удаляем все кэшированные версии
-        const basename = path.parse(filename).name
-        const cacheDir = path.join(config.uploadDir, 'cache')
+        // Удаляем все кэшированные версии
+        const cachePath = this.getCachePath(filename)
+        const cacheDir = path.dirname(cachePath)
         try {
             const cacheFiles = await fs.readdir(cacheDir)
+            const { name } = path.parse(filename)
             await Promise.all(
                 cacheFiles
-                    .filter((file) => file.startsWith(basename))
+                    .filter((file) => file.startsWith(name))
                     .map((file) => fs.unlink(path.join(cacheDir, file)))
             )
         } catch (error) {
@@ -68,7 +81,7 @@ export class ImageService {
     }
 
     async getImageInfo(filename: string) {
-        const filepath = path.join(config.uploadDir, filename)
+        const filepath = this.getFullPath(filename)
         const metadata = await sharp(filepath).metadata()
         const stats = await fs.stat(filepath)
         return {
@@ -87,7 +100,7 @@ export class ImageService {
         format?: 'jpeg' | 'webp' | 'png',
         size?: keyof typeof config.imageOptions.sizes
     ) {
-        const inputPath = path.join(config.uploadDir, filename)
+        const inputPath = this.getFullPath(filename)
 
         // Проверяем существование файла
         try {
@@ -96,16 +109,15 @@ export class ImageService {
             throw new Error('Файл не найден')
         }
 
-        // Формируем кэш-ключ (всегда используем webp)
-        const cacheKey = `${path.parse(filename).name}_${size || 'original'}.webp`
-        const cachePath = path.join(config.uploadDir, 'cache', cacheKey)
+        // Получаем путь в кэше
+        const cachePath = this.getCachePath(filename, size)
 
         // Проверяем наличие в кэше
         try {
             await fs.access(cachePath)
             return {
                 path: cachePath,
-                filename: cacheKey,
+                filename: path.basename(cachePath),
             }
         } catch {
             // Если нет в кэше, создаем
@@ -128,16 +140,14 @@ export class ImageService {
             })
 
             // Создаем директорию кэша если не существует
-            await fs.mkdir(path.join(config.uploadDir, 'cache'), {
-                recursive: true,
-            })
+            await fs.mkdir(path.dirname(cachePath), { recursive: true })
 
             // Сохраняем в кэш
             await image.toFile(cachePath)
 
             return {
                 path: cachePath,
-                filename: cacheKey,
+                filename: path.basename(cachePath),
             }
         }
     }

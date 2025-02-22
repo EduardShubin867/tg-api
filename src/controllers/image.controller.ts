@@ -16,9 +16,12 @@ export class ImageController {
                 return res.status(400).json({ error: 'Файл не загружен' })
             }
 
-            const result = await this.imageService.processImage(
-                req.file.filename
-            )
+            // Формируем относительный путь с учетом подпапки
+            const subfolder = req.body.subfolder || ''
+            const relativeFilePath = path.join(subfolder, req.file.filename)
+
+            const result =
+                await this.imageService.processImage(relativeFilePath)
             res.json(result)
         } catch (error) {
             res.status(500).json({ error: 'Ошибка при обработке изображения' })
@@ -98,7 +101,6 @@ export class ImageController {
                 | keyof typeof config.imageOptions.sizes
                 | undefined
 
-            // Проверяем валидность параметров
             if (format && !config.imageOptions.formats.includes(validFormat!)) {
                 return res
                     .status(400)
