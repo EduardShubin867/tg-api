@@ -14,7 +14,7 @@ services:
         volumes:
             - ./public:/app/public
         networks:
-            - app-network
+            - bot-network
 
     mongodb:
         image: mongo:latest
@@ -23,7 +23,7 @@ services:
         volumes:
             - mongodb_data:/data/db
         networks:
-            - app-network
+            - bot-network
 
 networks:
     bot-network:
