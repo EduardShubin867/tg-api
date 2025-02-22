@@ -5,12 +5,16 @@ import { config } from '../config'
 
 export class ImageService {
     private getFullPath(filename: string): string {
+        // Убираем 'uploads/' из пути если он там есть
+        const cleanPath = filename.replace(/^uploads\//, '')
         // Обрабатываем пути с подпапками
-        return path.join(config.uploadDir, filename)
+        return path.join(config.uploadDir, cleanPath)
     }
 
     private getCachePath(filename: string, size?: string): string {
-        const { dir, name } = path.parse(filename)
+        // Убираем 'uploads/' из пути если он там есть
+        const cleanPath = filename.replace(/^uploads\//, '')
+        const { dir, name } = path.parse(cleanPath)
         const cacheDir = path.join(config.uploadDir, 'cache', dir)
         const cacheKey = `${name}_${size || 'original'}.webp`
         return path.join(cacheDir, cacheKey)
