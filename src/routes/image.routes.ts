@@ -15,15 +15,15 @@ router.use((req, res, next) => {
 router.post('/upload', upload.single('image'), imageController.upload)
 
 // Получение изображения (поддержка вложенных путей)
-router.get('/serve/*', imageController.serve)
+router.get('/serve/:path(*)', imageController.serve)
 
 // Трансформация изображения (поддержка вложенных путей)
-router.get('/transform/*', imageController.transform)
+router.get('/transform/:path(*)', imageController.transform)
 
 // Удаление изображения (поддержка вложенных путей)
-router.delete('/*', imageController.delete)
+router.delete('/:path(*)', imageController.delete)
 
 // Получение информации об изображении (поддержка вложенных путей)
-router.get('/*/info', imageController.getInfo)
+router.get('/:path(*)/info', imageController.getInfo)
 
 export default router

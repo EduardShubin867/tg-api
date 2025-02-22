@@ -31,11 +31,11 @@ export class ImageController {
 
     transform = async (req: Request, res: Response) => {
         try {
-            const { filename } = req.params
+            const { path: filePath } = req.params
             const { format, size } = req.query
 
-            if (!filename) {
-                return res.status(400).json({ error: 'Имя файла не указано' })
+            if (!filePath) {
+                return res.status(400).json({ error: 'Путь к файлу не указан' })
             }
 
             const validFormat = format as 'jpeg' | 'webp' | 'png'
@@ -54,7 +54,7 @@ export class ImageController {
             }
 
             const result = await this.imageService.processImage(
-                filename,
+                filePath,
                 validFormat,
                 validSize
             )
@@ -68,8 +68,8 @@ export class ImageController {
 
     delete = async (req: Request, res: Response) => {
         try {
-            const { filename } = req.params
-            await this.imageService.deleteImage(filename)
+            const { path: filePath } = req.params
+            await this.imageService.deleteImage(filePath)
             res.json({ message: 'Изображение успешно удалено' })
         } catch (error) {
             res.status(500).json({ error: 'Ошибка при удалении изображения' })
@@ -78,8 +78,8 @@ export class ImageController {
 
     getInfo = async (req: Request, res: Response) => {
         try {
-            const { filename } = req.params
-            const info = await this.imageService.getImageInfo(filename)
+            const { path: filePath } = req.params
+            const info = await this.imageService.getImageInfo(filePath)
             res.json(info)
         } catch (error) {
             res.status(500).json({
@@ -90,19 +90,19 @@ export class ImageController {
 
     serve = async (req: Request, res: Response) => {
         try {
-            const { filename } = req.params
+            const { path: filePath } = req.params
             const { format, size } = req.query
 
             console.log('Serving image:', {
-                filename,
+                filePath,
                 format,
                 size,
                 params: req.params,
                 query: req.query,
             })
 
-            if (!filename) {
-                return res.status(400).json({ error: 'Имя файла не указано' })
+            if (!filePath) {
+                return res.status(400).json({ error: 'Путь к файлу не указан' })
             }
 
             const validFormat = format as 'jpeg' | 'webp' | 'png' | undefined
@@ -123,7 +123,7 @@ export class ImageController {
             }
 
             const result = await this.imageService.getImage(
-                filename,
+                filePath,
                 validFormat,
                 validSize
             )
