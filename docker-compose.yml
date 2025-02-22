@@ -15,6 +15,7 @@ services:
             - ./public:/app/public
         networks:
             - bot-network
+        container_name: tarot-app
 
     mongodb:
         image: mongo:latest
