@@ -120,6 +120,35 @@ router.post('/spread', async (req: Request, res: Response) => {
     }
 })
 
+// Маршрут для простого расклада (только карты без интерпретации)
+router.post('/simple-spread', (_req: Request, res: Response) => {
+    try {
+        // Генерируем расклад
+        const shuffled = [...tarotCards].sort(() => 0.5 - Math.random())
+        const spread = {
+            past: {
+                name: shuffled[0].name,
+                meaning: shuffled[0].meaning,
+            },
+            present: {
+                name: shuffled[1].name,
+                meaning: shuffled[1].meaning,
+            },
+            future: {
+                name: shuffled[2].name,
+                meaning: shuffled[2].meaning,
+            },
+        }
+
+        res.json({ spread })
+    } catch (error) {
+        console.error('Ошибка при генерации простого расклада:', error)
+        res.status(500).json({
+            error: 'Ошибка при генерации простого расклада',
+        })
+    }
+})
+
 // Тестовый маршрут
 router.get('/', (_req: Request, res: Response) => {
     res.send('Tarot API is running')
