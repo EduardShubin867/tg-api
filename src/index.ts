@@ -45,8 +45,13 @@ app.use(
         methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
         credentials: true,
         exposedHeaders: ['Content-Type', 'Content-Length'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+        maxAge: 86400, // 24 часа
     })
 )
+
+// Добавляем промежуточное ПО для предварительной проверки CORS
+app.options('*', cors()) // Включаем предварительную проверку CORS для всех маршрутов
 
 app.use(express.json())
 
