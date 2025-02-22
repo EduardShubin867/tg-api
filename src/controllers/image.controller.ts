@@ -119,6 +119,18 @@ export class ImageController {
                 validSize
             )
 
+            // Устанавливаем CORS заголовки
+            res.setHeader(
+                'Access-Control-Allow-Origin',
+                'https://eduardshubin867-tarot-miniapp-e31c.twc1.net'
+            )
+            res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
+            res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
+            res.setHeader(
+                'Access-Control-Allow-Headers',
+                'Origin, X-Requested-With, Content-Type, Accept'
+            )
+
             // Устанавливаем заголовки для кэширования
             res.setHeader('Cache-Control', 'public, max-age=31536000') // 1 год
             res.setHeader(

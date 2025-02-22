@@ -18,11 +18,19 @@ app.use(
                 defaultSrc: ["'self'"],
                 scriptSrc: ["'self'", 'cdnjs.cloudflare.com'],
                 styleSrc: ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
-                imgSrc: ["'self'", 'data:', 'blob:'],
+                imgSrc: [
+                    "'self'",
+                    'data:',
+                    'blob:',
+                    'https://mvtgbotapi.ru',
+                    'https://eduardshubin867-tarot-miniapp-e31c.twc1.net',
+                ],
                 connectSrc: ["'self'", 'api.openai.com'],
                 fontSrc: ["'self'", 'cdnjs.cloudflare.com'],
             },
         },
+        crossOriginResourcePolicy: { policy: 'cross-origin' },
+        crossOriginEmbedderPolicy: false,
     })
 )
 
@@ -36,6 +44,7 @@ app.use(
         ],
         methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
         credentials: true,
+        exposedHeaders: ['Content-Type', 'Content-Length'],
     })
 )
 
