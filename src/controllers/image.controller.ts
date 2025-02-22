@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { ImageService } from '../services/image.service'
 import { config } from '../config'
 import path from 'path'
+import fs from 'fs/promises'
 
 export class ImageController {
     private imageService: ImageService
@@ -92,6 +93,14 @@ export class ImageController {
             const { filename } = req.params
             const { format, size } = req.query
 
+            console.log('Serving image:', {
+                filename,
+                format,
+                size,
+                params: req.params,
+                query: req.query,
+            })
+
             if (!filename) {
                 return res.status(400).json({ error: 'Имя файла не указано' })
             }
@@ -119,6 +128,11 @@ export class ImageController {
                 validSize
             )
 
+            console.log('Image result:', {
+                path: result.path,
+                filename: result.filename,
+            })
+
             // Устанавливаем CORS заголовки
             res.setHeader(
                 'Access-Control-Allow-Origin',
@@ -138,9 +152,19 @@ export class ImageController {
                 `image/${path.extname(result.filename).slice(1)}`
             )
 
+            // Проверяем существование файла перед отправкой
+            try {
+                await fs.access(result.path)
+                console.log('File exists:', result.path)
+            } catch (error) {
+                console.error('File not found:', result.path)
+                return res.status(404).json({ error: 'Файл не найден' })
+            }
+
             // Отправляем файл
             res.sendFile(result.path)
         } catch (error) {
+            console.error('Error serving image:', error)
             if (error instanceof Error && error.message === 'Файл не найден') {
                 res.status(404).json({ error: 'Изображение не найдено' })
             } else {

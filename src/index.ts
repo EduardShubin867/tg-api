@@ -55,16 +55,56 @@ app.options('*', cors()) // Включаем предварительную пр
 
 app.use(express.json())
 
+// Логирование запросов
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`)
+    next()
+})
+
 // Статические файлы
 app.use(express.static(path.join(__dirname, 'public')))
-app.use('/uploads', express.static(config.uploadDir))
 
-// Получение списка файлов
-app.get('/uploads', async (_req, res) => {
+// Настраиваем статические файлы для uploads с поддержкой CORS
+app.use(
+    '/uploads',
+    (req, res, next) => {
+        res.setHeader(
+            'Access-Control-Allow-Origin',
+            'https://eduardshubin867-tarot-miniapp-e31c.twc1.net'
+        )
+        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
+        next()
+    },
+    express.static(config.uploadDir)
+)
+
+// Получение списка файлов с информацией о директориях
+app.get('/uploads/info', async (_req, res) => {
     try {
-        const files = await fs.readdir(config.uploadDir)
-        res.json(files.filter((file) => !file.startsWith('.')))
+        const listFilesRecursively = async (dir: string): Promise<string[]> => {
+            const files = await fs.readdir(dir, { withFileTypes: true })
+            const paths = await Promise.all(
+                files.map(async (dirent) => {
+                    const res = path.join(dir, dirent.name)
+                    if (dirent.isDirectory()) {
+                        const subFiles = await listFilesRecursively(res)
+                        return subFiles
+                    }
+                    return res
+                })
+            )
+            return paths.flat()
+        }
+
+        const files = await listFilesRecursively(config.uploadDir)
+        const relativePaths = files
+            .map((file) => path.relative(config.uploadDir, file))
+            .filter((file) => !file.startsWith('.'))
+
+        console.log('Available files:', relativePaths)
+        res.json(relativePaths)
     } catch (error) {
+        console.error('Error listing files:', error)
         res.status(500).json({ error: 'Ошибка при получении списка файлов' })
     }
 })

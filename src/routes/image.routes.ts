@@ -5,19 +5,25 @@ import { upload } from '../middlewares/upload.middleware'
 const router = Router()
 const imageController = new ImageController()
 
+// Логирование запросов
+router.use((req, res, next) => {
+    console.log('Image route:', req.method, req.path, req.params)
+    next()
+})
+
 // Загрузка изображения
 router.post('/upload', upload.single('image'), imageController.upload)
 
-// Получение изображения
-router.get('/serve/:filename', imageController.serve)
+// Получение изображения (поддержка вложенных путей)
+router.get('/serve/*', imageController.serve)
 
-// Трансформация изображения
-router.get('/transform/:filename', imageController.transform)
+// Трансформация изображения (поддержка вложенных путей)
+router.get('/transform/*', imageController.transform)
 
-// Удаление изображения
-router.delete('/:filename', imageController.delete)
+// Удаление изображения (поддержка вложенных путей)
+router.delete('/*', imageController.delete)
 
-// Получение информации об изображении
-router.get('/:filename/info', imageController.getInfo)
+// Получение информации об изображении (поддержка вложенных путей)
+router.get('/*/info', imageController.getInfo)
 
 export default router
