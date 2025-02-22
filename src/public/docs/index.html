@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>API Documentation - Image CDN</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css"
+        />
+        <style>
+            :root {
+                --primary-color: #3498db;
+                --secondary-color: #2ecc71;
+                --text-color: #2c3e50;
+                --border-color: #eee;
+                --code-bg: #2d2d2d;
+                --method-get: #61affe;
+                --method-post: #49cc90;
+                --method-delete: #f93e3e;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                    Oxygen, Ubuntu, Cantarell, sans-serif;
+                line-height: 1.6;
+                color: var(--text-color);
+                background: #f8f9fa;
+            }
+
+            .container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .sidebar {
+                width: 260px;
+                background: white;
+                padding: 2rem;
+                border-right: 1px solid var(--border-color);
+                position: fixed;
+                height: 100vh;
+                overflow-y: auto;
+            }
+
+            .content {
+                flex: 1;
+                padding: 2rem;
+                margin-left: 260px;
+                max-width: 900px;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: var(--primary-color);
+                margin-bottom: 2rem;
+            }
+
+            .nav-item {
+                margin-bottom: 1rem;
+            }
+
+            .nav-link {
+                color: var(--text-color);
+                text-decoration: none;
+                display: block;
+                padding: 0.5rem;
+                border-radius: 4px;
+                transition: background 0.3s;
+            }
+
+            .nav-link:hover {
+                background: #f8f9fa;
+            }
+
+            h1,
+            h2,
+            h3 {
+                margin: 2rem 0 1rem;
+                color: var(--text-color);
+            }
+
+            h1 {
+                font-size: 2.5rem;
+                border-bottom: 2px solid var(--border-color);
+                padding-bottom: 0.5rem;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            h3 {
+                font-size: 1.3rem;
+                color: var(--primary-color);
+            }
+
+            p {
+                margin-bottom: 1rem;
+            }
+
+            .endpoint {
+                background: white;
+                border-radius: 8px;
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .method {
+                display: inline-block;
+                padding: 0.3rem 0.8rem;
+                border-radius: 4px;
+                color: white;
+                font-weight: bold;
+                margin-right: 1rem;
+            }
+
+            .method.get {
+                background: var(--method-get);
+            }
+            .method.post {
+                background: var(--method-post);
+            }
+            .method.delete {
+                background: var(--method-delete);
+            }
+
+            .url {
+                font-family: monospace;
+                background: var(--code-bg);
+                color: white;
+                padding: 0.3rem 0.8rem;
+                border-radius: 4px;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 1rem 0;
+            }
+
+            th,
+            td {
+                padding: 0.8rem;
+                text-align: left;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            th {
+                background: #f8f9fa;
+            }
+
+            .response-example {
+                background: var(--code-bg);
+                padding: 1rem;
+                border-radius: 4px;
+                margin: 1rem 0;
+            }
+
+            .features {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1.5rem;
+                margin: 2rem 0;
+            }
+
+            .feature-card {
+                background: white;
+                padding: 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .feature-card h4 {
+                color: var(--primary-color);
+                margin-bottom: 1rem;
+            }
+
+            .error-codes {
+                background: white;
+                padding: 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                margin: 2rem 0;
+            }
+
+            @media (max-width: 768px) {
+                .container {
+                    flex-direction: column;
+                }
+                .sidebar {
+                    width: 100%;
+                    height: auto;
+                    position: static;
+                    border-right: none;
+                    border-bottom: 1px solid var(--border-color);
+                }
+                .content {
+                    margin-left: 0;
+                    padding: 1rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="sidebar">
+                <div class="logo">Image CDN API</div>
+                <nav>
+                    <div class="nav-item">
+                        <a href="#introduction" class="nav-link">Введение</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#endpoints" class="nav-link">Эндпоинты</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#upload" class="nav-link"
+                            >Загрузка изображения</a
+                        >
+                    </div>
+                    <div class="nav-item">
+                        <a href="#serve" class="nav-link"
+                            >Получение изображения</a
+                        >
+                    </div>
+                    <div class="nav-item">
+                        <a href="#info" class="nav-link"
+                            >Информация об изображении</a
+                        >
+                    </div>
+                    <div class="nav-item">
+                        <a href="#delete" class="nav-link"
+                            >Удаление изображения</a
+                        >
+                    </div>
+                    <div class="nav-item">
+                        <a href="#features" class="nav-link">Особенности</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#errors" class="nav-link">Коды ошибок</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#examples" class="nav-link"
+                            >Примеры использования</a
+                        >
+                    </div>
+                </nav>
+            </div>
+
+            <main class="content">
+                <section id="introduction">
+                    <h1>API Documentation</h1>
+                    <p>
+                        API для управления изображениями с автоматической
+                        оптимизацией и конвертацией в WebP формат.
+                    </p>
+
+                    <div class="endpoint">
+                        <h3>Базовый URL</h3>
+                        <code class="url"
+                            >http://localhost:3000/api/images</code
+                        >
+                    </div>
+                </section>
+
+                <section id="endpoints">
+                    <h2>Эндпоинты</h2>
+
+                    <div id="upload" class="endpoint">
+                        <h3>Загрузка изображения</h3>
+                        <p>
+                            Загружает новое изображение и автоматически
+                            конвертирует его в WebP формат.
+                        </p>
+
+                        <span class="method post">POST</span>
+                        <code class="url">/upload</code>
+
+                        <h4>Параметры запроса:</h4>
+                        <table>
+                            <tr>
+                                <th>Параметр</th>
+                                <th>Тип</th>
+                                <th>Описание</th>
+                            </tr>
+                            <tr>
+                                <td>image</td>
+                                <td>File</td>
+                                <td>
+                                    Файл изображения (jpg, jpeg, png, gif, webp)
+                                </td>
+                            </tr>
+                        </table>
+
+                        <h4>Пример ответа:</h4>
+                        <pre
+                            class="response-example"
+                        ><code class="language-json">{
+    "filename": "photo_original.webp",
+    "format": "webp",
+    "size": "original",
+    "width": 1920,
+    "height": 1080
+}</code></pre>
+                    </div>
+
+                    <div id="serve" class="endpoint">
+                        <h3>Получение изображения</h3>
+                        <p>
+                            Получает изображение с опциональными параметрами
+                            размера.
+                        </p>
+
+                        <span class="method get">GET</span>
+                        <code class="url">/serve/:filename</code>
+
+                        <h4>Параметры запроса:</h4>
+                        <table>
+                            <tr>
+                                <th>Параметр</th>
+                                <th>Тип</th>
+                                <th>Описание</th>
+                                <th>Обязательный</th>
+                            </tr>
+                            <tr>
+                                <td>size</td>
+                                <td>string</td>
+                                <td>
+                                    Размер изображения (thumbnail/medium/large)
+                                </td>
+                                <td>Нет</td>
+                            </tr>
+                        </table>
+
+                        <h4>Поддерживаемые размеры:</h4>
+                        <ul>
+                            <li>thumbnail: 150x150px</li>
+                            <li>medium: 300x300px</li>
+                            <li>large: 800x800px</li>
+                        </ul>
+                    </div>
+
+                    <div id="info" class="endpoint">
+                        <h3>Информация об изображении</h3>
+                        <p>Возвращает метаданные изображения.</p>
+
+                        <span class="method get">GET</span>
+                        <code class="url">/:filename/info</code>
+
+                        <h4>Пример ответа:</h4>
+                        <pre
+                            class="response-example"
+                        ><code class="language-json">{
+    "filename": "photo_original.webp",
+    "format": "webp",
+    "width": 1920,
+    "height": 1080,
+    "size": 153478,
+    "created": "2024-02-22T12:00:00.000Z",
+    "modified": "2024-02-22T12:00:00.000Z"
+}</code></pre>
+                    </div>
+
+                    <div id="delete" class="endpoint">
+                        <h3>Удаление изображения</h3>
+                        <p>
+                            Удаляет изображение и все его кэшированные версии.
+                        </p>
+
+                        <span class="method delete">DELETE</span>
+                        <code class="url">/:filename</code>
+
+                        <h4>Пример ответа:</h4>
+                        <pre
+                            class="response-example"
+                        ><code class="language-json">{
+    "message": "Изображение успешно удалено"
+}</code></pre>
+                    </div>
+                </section>
+
+                <section id="features">
+                    <h2>Особенности и оптимизации</h2>
+
+                    <div class="features">
+                        <div class="feature-card">
+                            <h4>WebP конвертация</h4>
+                            <ul>
+                                <li>Автоматическая конвертация в WebP</li>
+                                <li>Качество: 80</li>
+                                <li>Максимальное сжатие (effort: 6)</li>
+                                <li>Оптимальное соотношение размер/качество</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-card">
+                            <h4>Кэширование</h4>
+                            <ul>
+                                <li>Кэширование трансформаций</li>
+                                <li>Автоочистка кэша</li>
+                                <li>Browser caching</li>
+                                <li>Оптимизация загрузки</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-card">
+                            <h4>Безопасность</h4>
+                            <ul>
+                                <li>Валидация файлов</li>
+                                <li>Лимит размера (5MB)</li>
+                                <li>CSP защита</li>
+                                <li>CORS настройки</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="errors" class="error-codes">
+                    <h2>Коды ошибок</h2>
+                    <table>
+                        <tr>
+                            <th>Код</th>
+                            <th>Описание</th>
+                        </tr>
+                        <tr>
+                            <td>400</td>
+                            <td>
+                                Неверный запрос (неподдерживаемый формат и т.д.)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>404</td>
+                            <td>Изображение не найдено</td>
+                        </tr>
+                        <tr>
+                            <td>413</td>
+                            <td>Превышен максимальный размер файла</td>
+                        </tr>
+                        <tr>
+                            <td>500</td>
+                            <td>Внутренняя ошибка сервера</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section id="examples">
+                    <h2>Примеры использования</h2>
+
+                    <div class="endpoint">
+                        <h3>HTML</h3>
+                        <pre><code class="language-html">&lt;!-- Оригинальное изображение --&gt;
+                            &lt;img src="http://localhost:3000/api/images/serve/photo_original.webp" /&gt;
+
+                            &lt;!-- Уменьшенная версия --&gt;
+                            &lt;img src="http://localhost:3000/api/images/serve/photo_original.webp?size=thumbnail" /&gt;</code></pre>
+                    </div>
+
+                    <div class="endpoint">
+                        <h3>Примеры URL</h3>
+                        <pre><code class="language-bash"># Получение оригинального изображения
+                            http://localhost:3000/api/images/serve/image-1234567890-123456_original.webp
+
+                            # Получение уменьшенной версии
+                            http://localhost:3000/api/images/serve/image-1234567890-123456_original.webp?size=thumbnail
+
+                            # Получение информации об изображении
+                            http://localhost:3000/api/images/image-1234567890-123456_original.webp/info</code></pre>
+                    </div>
+
+                    <div class="endpoint">
+                        <h3>JavaScript</h3>
+                        <pre><code class="language-javascript">// Загрузка изображения
+                            const formData = new FormData()
+                            formData.append('image', fileInput.files[0])
+
+                            const response = await fetch('http://localhost:3000/api/images/upload', {
+                                method: 'POST',
+                                body: formData
+                            })
+
+                            const result = await response.json()</code></pre>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-bash.min.js"></script>
+        <script>
+            // Плавная прокрутка к разделам
+            document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault()
+                    document
+                        .querySelector(this.getAttribute('href'))
+                        .scrollIntoView({
+                            behavior: 'smooth',
+                        })
+                })
+            })
+        </script>
+    </body>
+</html>
